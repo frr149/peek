@@ -1,7 +1,7 @@
 import AppKit
 import CoreGraphics
 import Foundation
-import ScreenCaptureKit
+@preconcurrency import ScreenCaptureKit
 
 /// Errors from window capture.
 enum WindowCaptureError: Error, CustomStringConvertible {
