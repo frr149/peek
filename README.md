@@ -121,7 +121,8 @@ See [`skills/design-review/SKILL.md`](skills/design-review/SKILL.md) for the ful
 ### Homebrew
 
 ```bash
-brew install frr149/peek/peek
+brew tap frr149/tools
+brew install frr149/tools/peek
 ```
 
 ### From source

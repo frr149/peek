@@ -66,7 +66,7 @@ jobs:
           end
           FORMULA
 
-          git clone https://x-access-token:${TAP_TOKEN}@github.com/frr149/homebrew-peek.git /tmp/tap
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/frr149/homebrew-tools.git /tmp/tap
           cp /tmp/peek.rb /tmp/tap/Formula/peek.rb
           cd /tmp/tap
           git config user.name "GitHub Actions"

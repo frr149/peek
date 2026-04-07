@@ -14,7 +14,7 @@ A macOS CLI that gives AI coding assistants (and developers) a visual feedback l
 - Claude Code can capture all 5 ThinkLocal panels in <5 seconds total, without the developer noticing
 - `peek app ThinkLocal --all` produces 5 PNGs that accurately reflect the current UI state
 - `peek web http://localhost:3000` renders and captures a page without any visible browser window
-- `brew install frr149/peek/peek` works end-to-end
+- `brew tap frr149/tools && brew install frr149/tools/peek` works end-to-end
 
 ## Non-goals for v1.0
 
@@ -390,14 +390,14 @@ the PNG viewer; agents use the path. One surface serves both.
 - `git tag v1.0.0 && git push --tags` triggers GitHub Actions workflow
 - Workflow builds universal binary (arm64 + x86_64)
 - Workflow creates GitHub Release with tarball artifact
-- Workflow updates `frr149/homebrew-peek` tap with new formula
-- `brew install frr149/peek/peek` installs the latest release
+- Workflow updates `frr149/homebrew-tools` tap with new formula
+- `brew tap frr149/tools && brew install frr149/tools/peek` installs the latest release
 - `peek --version` shows the correct version from the git tag
 
 **Tests**:
 
 - `testVersionFlagShowsVersion`
-- Manual: `brew install frr149/peek/peek && peek list` works
+- Manual: `brew tap frr149/tools && brew install frr149/tools/peek && peek list` works
 
 ---
 

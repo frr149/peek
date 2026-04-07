@@ -7,7 +7,7 @@ PREFIX := /usr/local
 BUILD_DIR := .build/release
 DIST_DIR := dist
 GITHUB_REPO := frr149/peek
-TAP_REPO := frr149/homebrew-peek
+TAP_REPO := frr149/homebrew-tools
 
 # ─── Build ────────────────────────────────────────────────────────────
 
