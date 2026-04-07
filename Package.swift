@@ -24,11 +24,15 @@ let package = Package(
                 .linkedFramework("ApplicationServices"),
                 .linkedFramework("AppKit"),
                 .linkedFramework("WebKit"),
+                .linkedFramework("ScreenCaptureKit"),
             ]
         ),
         .testTarget(
             name: "PeekTests",
-            dependencies: ["peek"],
+            dependencies: [
+                "peek",
+                .product(name: "Yams", package: "Yams"),
+            ],
             path: "Tests/PeekTests"
         ),
     ]

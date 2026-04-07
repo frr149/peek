@@ -6,6 +6,12 @@ struct List: ParsableCommand {
     )
 
     func run() throws {
-        print("TODO: list capturable windows")
+        let apps = WindowDiscovery.listApps()
+
+        for app in apps {
+            let width = Int(app.mainSize.width)
+            let height = Int(app.mainSize.height)
+            print("\(app.name)\t\(app.windowCount)\t\(width)x\(height)")
+        }
     }
 }

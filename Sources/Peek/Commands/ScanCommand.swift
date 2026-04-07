@@ -15,6 +15,16 @@ struct Scan: ParsableCommand {
     var generateConfig = false
 
     func run() throws {
-        print("TODO: scan AX tree of '\(name)'")
+        let nodes = try AXScanner.scan(appName: name, maxDepth: depth)
+
+        if generateConfig {
+            // AX-4: YAML to stdout, parseable
+            let yaml = AXScanner.generateConfig(appName: name, nodes: nodes)
+            print(yaml)
+        } else {
+            // Human-readable tree
+            let tree = AXScanner.formatTree(nodes)
+            print(tree)
+        }
     }
 }

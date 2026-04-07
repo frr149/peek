@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build universal binary
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Build universal binary
+        run: swift build -c release --arch arm64 --arch x86_64
+
+      - name: Create tarball
+        run: |
+          mkdir -p dist
+          cp .build/apple/Products/Release/peek dist/peek
+          cd dist && tar -czf peek-${VERSION}-macos.tar.gz peek
+
+      - name: Compute SHA256
+        id: sha
+        run: echo "sha256=$(shasum -a 256 dist/peek-${VERSION}-macos.tar.gz | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/peek-${{ env.VERSION }}-macos.tar.gz
+          generate_release_notes: true
+
+      - name: Update Homebrew tap
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          if [ -z "$TAP_TOKEN" ]; then
+            echo "TAP_TOKEN not set — skipping tap update"
+            exit 0
+          fi
+          SHA="${{ steps.sha.outputs.sha256 }}"
+          cat > /tmp/peek.rb <<FORMULA
+          class Peek < Formula
+            desc "Capture app and web UI screenshots without stealing focus"
+            homepage "https://github.com/frr149/peek"
+            url "https://github.com/frr149/peek/releases/download/${VERSION}/peek-${VERSION}-macos.tar.gz"
+            sha256 "${SHA}"
+            license "MIT"
+
+            depends_on :macos
+
+            def install
+              bin.install "peek"
+            end
+
+            test do
+              assert_match "peek", shell_output("#{bin}/peek --version")
+            end
+          end
+          FORMULA
+
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/frr149/homebrew-peek.git /tmp/tap
+          cp /tmp/peek.rb /tmp/tap/Formula/peek.rb
+          cd /tmp/tap
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Formula/peek.rb
+          git commit -m "Update peek to ${VERSION}"
+          git push

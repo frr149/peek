@@ -25,6 +25,44 @@ peek turns UI development into a tight feedback loop for AI assistants:
 
 This is like a REPL, but for UI. The AI writes, sees, and iterates — autonomously.
 
+## Designed for agents
+
+Most CLI tools are designed for humans: colorful output, progress bars, decorative banners. peek is designed for LLM agents. Every design decision follows six Agent Experience (AX) principles:
+
+**AX-1: Token-efficient output.** On success, peek prints the PNG path. Nothing else. No banners, no emojis, no "Successfully captured!" prose. One line, one token.
+
+```bash
+$ peek app ThinkLocal
+/tmp/peek/ThinkLocal-20260407-183012.png
+```
+
+**AX-2: Zero mandatory flags.** Every command works with just the positional argument. `peek app Finder` captures Finder. `peek web http://localhost:3000` renders the page. No config required for basic use.
+
+**AX-3: Tolerance (fuzzy matching).** Agents hallucinate app names. peek handles it silently:
+
+```bash
+$ peek app "think local"    # matches "ThinkLocal"
+$ peek app thinklocal       # matches "ThinkLocal"
+$ peek app think            # matches "ThinkLocal" (substring)
+```
+
+Normalization: case-insensitive, strips spaces and hyphens, falls back to substring matching.
+
+**AX-4: Stable output contract.** The output format is a versioned contract. Agents parse it. `peek list` outputs tab-separated `<App>\t<Windows>\t<WxH>`. `peek scan` outputs YAML. These formats never change without a major version bump.
+
+**AX-5: Actionable errors.** When something fails, peek tells the agent what to do:
+
+```bash
+$ peek app ThinkLocal --panel Chat
+Error: No config for "ThinkLocal". Generate one with: peek scan ThinkLocal --generate-config > ~/.config/peek/ThinkLocal.yml
+```
+
+**AX-6: One surface.** Unlike tools that need separate human/machine interfaces, peek's output (a file path) is natively useful to both humans (open the PNG) and agents (read the path). No dual surface needed.
+
+### Why this matters
+
+An agent using peek spends 1 token on output parsing. An agent using a verbose CLI spends 15+ tokens filtering noise. Multiply by hundreds of captures in a design iteration session, and token-efficient design becomes a real cost advantage.
+
 ## Design review workflow
 
 peek pairs with a **design review skill** (included below) to give AI assistants access to a panel of design experts. The full autonomous workflow:
@@ -143,7 +181,7 @@ peek scan ThinkLocal --generate-config
 
 ## How it works
 
-- **Native apps:** Uses `CGWindowListCreateImage` to capture a specific window by ID — no focus stealing, works even when the window is behind others.
+- **Native apps:** Uses ScreenCaptureKit (`SCScreenshotManager`) to capture a specific window by ID — no focus stealing, works even when the window is behind others. Retina-resolution by default.
 - **AX navigation:** Uses the macOS Accessibility API (`AXUIElement`) to interact with app controls without bringing the window to front.
 - **Web pages:** Loads the URL in a headless `WKWebView`, waits for page load, and captures the rendered output. No browser needed.
 

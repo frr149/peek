@@ -1,6 +1,7 @@
 import ArgumentParser
+import Foundation
 
-struct Web: ParsableCommand {
+struct Web: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Capture a web page headlessly using WebKit."
     )
@@ -20,7 +21,18 @@ struct Web: ParsableCommand {
     @Option(name: .shortAndLong, help: "Output file path.")
     var output: String?
 
-    func run() throws {
-        print("TODO: capture web '\(url)'")
+    @MainActor
+    func run() async throws {
+        let outputPath = OutputPath.forWeb(url: url, customPath: output)
+        let capture = WebCapture(width: width, height: height)
+
+        let result = try await capture.capture(
+            urlString: url,
+            waitDelay: wait,
+            outputPath: outputPath
+        )
+
+        // AX-1: stdout prints only the path
+        print(result)
     }
 }

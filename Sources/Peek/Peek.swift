@@ -1,7 +1,7 @@
 import ArgumentParser
 
 @main
-struct Peek: ParsableCommand {
+struct Peek: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "peek",
         abstract: "Capture app and web UI screenshots without stealing focus.",
